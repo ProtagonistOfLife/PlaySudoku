@@ -64,10 +64,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="hanshu.cpp" />
     <ClCompile Include="newmain.cpp" />
-    <ClCompile Include="newThink.cpp" />
-    <ClCompile Include="start.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
