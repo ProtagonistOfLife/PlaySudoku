@@ -13,23 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="源文件\old">
-      <UniqueIdentifier>{93b4e281-209d-44dd-9f17-d3d77ce3aa8a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\binary">
       <UniqueIdentifier>{4c5543f2-6ecf-4ea1-b2db-2fc422ffd737}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="newThink.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="start.cpp">
-      <Filter>源文件\old</Filter>
-    </ClCompile>
-    <ClCompile Include="hanshu.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="newmain.cpp">
       <Filter>源文件\binary</Filter>
     </ClCompile>

@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SUM 1023
+#define SUM 511
+#define FALSE 0
+#define TRUE 1
 
 int array[9][9];
 short flags[9][9];
@@ -10,18 +12,34 @@ void init3();
 void clean(int row,int col);
 
 int log2(int number){
-	for (int i = 1; i < 10; i++){
-		if (number >> i)
+	int i = 0;
+	for (; i < 10; i++){
+		if (number >> i == 0)
 		{
-			continue;
+			break;
 		}
-		return i;
 	}
+	return i;
+	
+	
+}
+
+//比较两个字符串数组是否相等
+int equals(char* cs1, char* cs2){
+	int length = sizeof(cs1) > sizeof(cs2) ? sizeof(cs1) : sizeof(cs2);
+	length /= sizeof(char);
+	for (int i = 0; i < length; i++){
+		if (cs1[i] != cs2[i])
+		{
+			return FALSE;
+		}
+	}
+	return true;
 }
 
 void main(){
-	
-	init3();
+	char script[20];
+start:	init3();
 	for (int i = 0; i < 9; i++)
 	{
 		for (int j = 0; j < 9; j++){
@@ -36,18 +54,22 @@ void main(){
 		}
 		printf("\n");
 	}
+	gets_s(script);
+	if (!equals(script, "over")){
+		goto start;
+	}
 	system("pause");
 }
 
 void init3(){
-	char string[81];
+	char string[82];
 	gets_s(string);
 	int num,row,col;
 	for (int i = 0; i < 81; i++){
 		row = i / 9;
 		col = i % 9;
-		num = string[i] - 48;
-		if (num>0 && num<10)
+		num = string[i] - 49;
+		if (num>-1 && num<9)
 		{
 			num = 1 << num;
 			flags[row][col] = 1;
@@ -81,7 +103,6 @@ void clean(int i,int j){
 			if (flags[i][k] == 1)
 			{
 				clean(i,k);
-				continue;
 			}
 		}
 		if (array[k][j]&num && k!=i)
@@ -91,12 +112,11 @@ void clean(int i,int j){
 			if (flags[k][j] == 1)
 			{
 				clean(k, j);
-				continue;
 			}
 		}
 	}
-	for (int a = (i / 3) * 3; a < (i / 3) * 4; a++){
-		for (int b = (j / 3) * 3; a < (j / 3) * 4; b++)
+	for (int a = (i / 3) * 3; a < (i / 3 + 1) * 3; a++){
+		for (int b = (j / 3) * 3; b < (j / 3 + 1) * 3; b++)
 		{
 			if (array[a][b]&num && array[a][b] != num){
 				array[a][b] -= num;
