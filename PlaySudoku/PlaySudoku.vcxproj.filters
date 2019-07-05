@@ -16,10 +16,16 @@
     <Filter Include="源文件\binary">
       <UniqueIdentifier>{4c5543f2-6ecf-4ea1-b2db-2fc422ffd737}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\function">
+      <UniqueIdentifier>{dd78c912-8725-42ad-92fb-0dd162c9571f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="newmain.cpp">
       <Filter>源文件\binary</Filter>
+    </ClCompile>
+    <ClCompile Include="equation.cpp">
+      <Filter>源文件\function</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
