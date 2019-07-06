@@ -7,10 +7,33 @@
 
 int array[9][9];
 short flags[9][9];
+int or_result[9];
 
 void init3();
 void clean(int row, int col);
 void fenxi();
+void cleancolpossible(int col, int number, int num);
+void cleanrowpossible(int row, int number, int num);
+
+void or_init(){
+	int row_start, col_start;
+	for (int i = 0; i < 9; i++)
+	{
+		or_result[i] = 0;
+		row_start = i / 3 * 3;
+		col_start = i % 3 * 3;
+		for (int j = row_start; j < row_start+3; j++)
+		{
+			for (int k = col_start; k < col_start+3; k++)
+			{
+				if (flags[j][k] > 1)
+				{
+					or_result[i] |= array[j][k];
+				}
+			}
+		}
+	}
+}
 
 int log2(int number){
 	int i = 0;
@@ -40,8 +63,9 @@ int equals(char* cs1, char* cs2){
 
 void main(){
 	char script[20];
-	int w = 0;
+	int w;
 start:
+	w = 0;
 	init3();
 jisuan:
 	//清除可能未知框中的可能性
@@ -54,7 +78,7 @@ jisuan:
 		}
 	}
 	fenxi();
-	while (w < 100)
+	while (w < 40)
 	{
 		w++;
 		goto jisuan;
@@ -146,6 +170,78 @@ void clean(int i, int j){
 	}
 }
 
+//将行间的可能性去除
+void rowdel(){
+	or_init();
+	int row_start, col_start;
+	int temparr[3];
+	for (int i = 0; i < 9; i++)
+	{
+		row_start = i / 3 * 3;
+		col_start = i % 3 * 3;
+		for (int j = row_start; j < row_start+3; j++)
+		{
+			temparr[j - row_start] = 0;
+			for (int k = col_start; k < col_start+3; k++)
+			{
+				if (flags[j][k]  == 1)
+				{
+					continue;
+				}
+				temparr[j - row_start] |= array[j][k];
+			}
+		}
+		if ((temparr[0] | temparr[1]) != or_result[i])
+		{
+			cleanrowpossible(row_start + 2, i, or_result[i] - (temparr[0] |temparr[1]));
+		}
+		if ((temparr[0] | temparr[2]) != or_result[i])
+		{
+			cleanrowpossible(row_start + 1, i, or_result[i] - (temparr[0] | temparr[2]));
+		}
+		if ((temparr[1] | temparr[2]) != or_result[i])
+		{
+			cleanrowpossible(row_start, i, or_result[i] - (temparr[2] | temparr[1]));
+		}
+	}
+}
+
+void coldel(){
+	or_init();
+	int row_start, col_start;
+	int temparr[3];
+	for (int i = 0; i < 9; i++)
+	{
+		row_start = i / 3 * 3;
+		col_start = i % 3 * 3;
+		for (int j = col_start; j < col_start + 3; j++)
+		{
+			temparr[j - col_start] = 0;
+			for (int k = row_start; k < row_start + 3; k++)
+			{
+				if (flags[k][j] == 1)
+				{
+					continue;
+				}
+				temparr[j - col_start] |= array[k][j];
+			}
+		}
+		if ((temparr[0] | temparr[1]) != or_result[i])
+		{
+			cleancolpossible(col_start + 2, i, or_result[i] - (temparr[1] | temparr[0]));
+			
+		}
+		if ((temparr[0] | temparr[2]) != or_result[i])
+		{
+			cleancolpossible(col_start + 1, i, or_result[i] - (temparr[2] | temparr[0]));
+		}
+		if ((temparr[1] | temparr[2]) != or_result[i])
+		{
+			cleancolpossible(col_start, i, or_result[i] - (temparr[1] | temparr[2]));
+		}
+	}
+}
+
 //行间排除分析
 void colExclude(){
 	int col;
@@ -213,121 +309,47 @@ void rowExclude(){
 }
 
 void cleanrowpossible(int row, int number, int num){
+	int tempnum;
 	for (int i = 0; i < 9; i++)
 	{
-		if (i /3 != number && number & array[row][i])
+		if (i /3 != (number % 3) && (num & array[row][i] && flags[row][i] > 1))
 		{
-			array[row][i] -= num;
+			tempnum = num & array[row][i];
+			array[row][i] -= tempnum;
+			for (int j = 0; j < 9; j++)
+			{
+				if (tempnum & (1<<j))
+				{
+					flags[row][i]--;
+				}
+			}
+			if (flags[row][i] == 1)
+			{
+				clean(row, i);
+			}
 		}
 	}
 }
 
 void cleancolpossible(int col, int number, int num){
+	int tempnum;
 	for (int i = 0; i < 9; i++)
 	{
-		if (i / 3 != number && number & array[i][col])
+		if (i / 3 != (number / 3) && (num & array[i][col] && flags[i][col] > 1))
 		{
-			array[i][col] -= num;
-		}
-	}
-}
-
-void delrowpossible(){
-	int tempnum,num, row;
-	int row_start, col_start;
-	for (int i = 0; i < 9; i++)
-	{
-		row_start = i / 3 * 3;
-		col_start = i % 3 * 3;
-		for (int j = row_start; j < row_start + 3; j++){
-			tempnum = SUM;
-			for (int k = col_start; k < col_start + 3; k++){
-				if (flags[j][k] > 1)
-				{
-					tempnum &= array[j][k];
-				}
-			}
-			if (tempnum == 0)
+			tempnum = num & array[i][col];
+			array[i][col] -= tempnum;
+			for (int j = 0; j < 9; j++)
 			{
-				continue;
-			}
-			for (int m = row_start; m < row_start + 3; m++){
-				if (m == j)
+				if (tempnum & (1 << j))
 				{
-					continue;
-				}
-				for (int n = col_start;n < col_start+3; n++)
-				{
-					num = tempnum & array[m][n];
-					if (num)
-					{
-						tempnum -= num;
-						continue;
-					}
-					if (!tempnum)
-					{
-						break;
-					}
-				}
-				if (!tempnum){
-					break;
+					flags[i][col]--;
 				}
 			}
-			if (!tempnum)
+			if (flags[i][col] == 1)
 			{
-				continue;
+				clean(i, col);
 			}
-			cleanrowpossible(j, i, tempnum);
-		}
-	}
-}
-
-void delcolpossible(){
-	int tempnum, num, row;
-	int row_start, col_start;
-	for (int i = 0; i < 9; i++)
-	{
-		row_start = i / 3 * 3;
-		col_start = i % 3 * 3;
-		for (int j = col_start; j < col_start + 3; j++){
-			tempnum = SUM;
-			for (int k = row_start; k < row_start + 3; k++){
-				if (flags[k][j] > 1)
-				{
-					tempnum &= array[k][j];
-				}
-			}
-			if (tempnum == 0)
-			{
-				continue;
-			}
-			for (int m = col_start; m < col_start + 3; m++){
-				if (m == j)
-				{
-					continue;
-				}
-				for (int n = row_start; n < row_start + 3; n++)
-				{
-					num = tempnum & array[n][m];
-					if (num)
-					{
-						tempnum -= num;
-						continue;
-					}
-					if (!tempnum)
-					{
-						break;
-					}
-				}
-				if (!tempnum){
-					break;
-				}
-			}
-			if (!tempnum)
-			{
-				continue;
-			}
-			cleancolpossible(j, i, tempnum);
 		}
 	}
 }
@@ -400,8 +422,8 @@ void fenxi(){
 	rowExclude();
 	colExclude();
 	tianExclude();
+	rowdel();
+	coldel();
 	//出现了负数,暂时注释掉
-//	delcolpossible();
-//	delrowpossible();
 }
 //
